@@ -1,0 +1,5 @@
+#! /bin/sh
+
+ca65 -t nes -o game.o game.s
+cl65 -t nes -o game.nes game.o
+

@@ -1,0 +1,5 @@
+#! /bin/sh
+
+ca65 -o bin/game.o game.s
+cl65 --config linker.conf -o bin/game.nes bin/game.o
+
