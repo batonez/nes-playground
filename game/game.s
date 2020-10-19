@@ -40,10 +40,13 @@ JOYPAD2   = $4017
 
 .segment "CODE"
 nmi:
+; Copy sprites into PPU memory
   LDA #$00
   STA OAMADDR
   LDA #$02
   STA OAMDMA
+
+  JSR read_input
   RTI
 
 irq:
@@ -133,24 +136,28 @@ reset:
   STA PPUDATA
 ;;;;
 
-  ; write sprite data
-  LDA #$00
-  STA $0200 ; Y-coord of first sprite
-  LDA #$05
-  STA $0201 ; tile number of first sprite
-  LDA #%00000000
-  STA $0202 ; attributes of first sprite
-  LDA #$00
-  STA $0203 ; X-coord of first sprite
+; write sprite data
+  LDX #$0
+  LDY #$0
 
-  LDA #$00
-  STA $0204
-  LDA #$06
-  STA $0205
-  LDA #%00000000
-  STA $0206
-  LDA #$08
-  STA $0207
+write_next_sprite:
+  LDA y_coords, Y ; Y-coord of first sprite
+  STA $0200, X 
+  INX
+  LDA tiles, Y ; tile number of first sprite
+  STA $0200, X 
+  INX
+  LDA attrs, Y ; attributes of first sprite
+  STA $0200, X 
+  INX
+  LDA x_coords, Y ; X-coord of first sprite
+  STA $0200, X 
+  INX
+
+  INY
+  CLC
+  CPY num_sprites
+  BCC write_next_sprite
 
   LDA #%10010000  ; turn on NMIs, sprites use first pattern table
   STA PPUCTRL
@@ -158,5 +165,44 @@ reset:
   STA PPUMASK
 
 forever:
-  jmp forever
+  LDA buttons
+  AND #%10000000
+  BNE pressed
+  JMP forever
+  pressed:
+    INC $0200
+    JMP forever
+
+read_input:
+  LDA #$01
+  STA JOYPAD1
+  STA buttons
+  LSR A
+  STA JOYPAD1
+  read_joy_bit:
+    LDA JOYPAD1
+    LSR A        ; bit 0 -> Carry
+    ROL buttons  ; Carry -> bit 0; bit 7 -> Carry
+    BCC read_joy_bit
+  RTS
+
+beep:
+  lda #$01    ; enable pulse 1
+  sta $4015
+  lda #$08    ; period
+  sta $4002
+  lda #$02
+  sta $4003
+  lda #$bf    ; volume
+  sta $4000
+  rts
+
+num_sprites: .byte $03
+x_coords: .byte $00, $08, $0F
+y_coords: .byte $00, $00, $00
+tiles: .byte $05, $06, $03
+attrs: .byte $00, $00, $00
+
+.segment "BSS"
+buttons: .res 1
 
