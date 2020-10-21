@@ -40,6 +40,10 @@ JOYPAD2   = $4017
 
 .segment "CODE"
 nmi:
+  PHA
+  TXA
+  PHA
+
 ; Copy sprites into PPU memory
   LDA #$00
   STA OAMADDR
@@ -47,13 +51,17 @@ nmi:
   STA OAMDMA
 
   JSR read_input
+  JSR handle_input
+
+  PLA
+  TAX
+  PLA
   RTI
 
 irq:
   rti
 
 reset:
-
   ; write palettes
   LDX PPUSTATUS ; resets PPUADDR
   LDX #$3f
@@ -165,13 +173,49 @@ write_next_sprite:
   STA PPUMASK
 
 forever:
-  LDA buttons
-  AND #%10000000
-  BNE pressed
   JMP forever
-  pressed:
+
+handle_input:
+  LDX buttons
+
+  TXA
+  AND #%00000001
+  BNE right_handler
+  right_handled:
+
+  TXA
+  AND #%00000010
+  BNE left_handler
+  left_handled:
+
+  TXA
+  AND #%00000100
+  BNE up_handler
+  up_handled:
+
+  TXA
+  AND #%00001000
+  BNE down_handler
+  down_handled:
+
+  RTS
+
+  right_handler:
+    INC $0203
+    CLV
+    BVC right_handled
+  left_handler:
+    DEC $0203
+    CLV
+    BVC left_handled
+  up_handler:
     INC $0200
-    JMP forever
+    CLV
+    BVC up_handled
+  down_handler:
+    DEC $0200
+    CLV
+    BVC down_handled
 
 read_input:
   LDA #$01
