@@ -53,9 +53,9 @@ nmi:
   LDA #$02
   STA OAMDMA
 
+  JSR update_player
   JSR read_input
   JSR handle_input
-  JSR update_player
 
   PLA
   TAX
@@ -215,8 +215,14 @@ forever:
     BVC left_handled
   down_handler:
     INC player_y
-    CLV
-    BVC down_handled
+
+    LDA #230
+    CMP player_y
+    BCS no_collision
+    STA player_y
+    no_collision:
+      CLV
+      BVC down_handled
   up_handler:
     DEC player_y
     CLV
