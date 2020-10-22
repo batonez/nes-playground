@@ -23,6 +23,9 @@ APUSTATUS = $4015
 JOYPAD1   = $4016
 JOYPAD2   = $4017
 
+;;; OAM RAM start
+OAMRAM    = $0200
+
 .segment "INES"
   .byte $4e, $45, $53, $1a
   .byte PRG_NPAGE 
@@ -238,16 +241,16 @@ forever:
   LDX left_sprite_addr
 
   LDA player_x
-  STA $0203, X
+  STA OAMRAM + 3, X
   LDA player_y
-  STA $0200, X
+  STA OAMRAM + 0, X
 
   LDX right_sprite_addr
-  STA $0200, X
+  STA OAMRAM + 0, X
 
   LDA player_x
   ADC #7
-  STA $0203, X
+  STA OAMRAM + 3, X
   RTS
 .endproc
 
@@ -265,12 +268,12 @@ forever:
 
 .proc load_sprite
   LDY oam_pointer
-  STA $0201, Y
+  STA OAMRAM + 1, Y
   TXA
-  STA $0202, Y
+  STA OAMRAM + 2, Y
   LDA #$00
-  STA $0200, Y
-  STA $0203, Y
+  STA OAMRAM + 0, Y
+  STA OAMRAM + 3, Y
 
   LDA oam_pointer
   TAX
