@@ -61,7 +61,7 @@ nmi:
 irq:
   rti
 
-reset:
+.proc reset
   ; write palettes
   LDX PPUSTATUS ; resets PPUADDR
   LDX #$3f
@@ -144,38 +144,39 @@ reset:
   STA PPUDATA
 ;;;;
 
-; write sprite data
-  LDX #$0
-  LDY #$0
+; initialize oam pointer
+  LDA #0
+  STA oam_pointer
 
-write_next_sprite:
-  LDA y_coords, Y ; Y-coord of first sprite
-  STA $0200, X 
-  INX
-  LDA tiles, Y ; tile number of first sprite
-  STA $0200, X 
-  INX
-  LDA attrs, Y ; attributes of first sprite
-  STA $0200, X 
-  INX
-  LDA x_coords, Y ; X-coord of first sprite
-  STA $0200, X 
-  INX
+; initialize player
+  LDA #0
+  STA player_x
+  STA player_y
 
-  INY
-  CLC
-  CPY num_sprites
-  BCC write_next_sprite
+; load player sprites
+  LDA #5
+  LDX #0
+  JSR load_sprite
+  STX left_sprite_addr
 
-  LDA #%10010000  ; turn on NMIs, sprites use first pattern table
+  LDA #6
+  LDX #0
+  JSR load_sprite
+  STA right_sprite_addr
+
+; turn on NMIs, sprites use first pattern table
+  LDA #%10010000  
   STA PPUCTRL
-  LDA #%00011110  ; turn on screen
+
+; turn on screen
+  LDA #%00011110  
   STA PPUMASK
 
 forever:
   JMP forever
+.endproc
 
-handle_input:
+.proc handle_input
   LDX buttons
 
   TXA
@@ -216,8 +217,9 @@ handle_input:
     DEC $0200
     CLV
     BVC down_handled
+.endproc
 
-read_input:
+.proc read_input
   LDA #$01
   STA JOYPAD1
   STA buttons
@@ -229,8 +231,9 @@ read_input:
     ROL buttons  ; Carry -> bit 0; bit 7 -> Carry
     BCC read_joy_bit
   RTS
+.endproc
 
-beep:
+.proc beep
   lda #$01    ; enable pulse 1
   sta $4015
   lda #$08    ; period
@@ -240,13 +243,36 @@ beep:
   lda #$bf    ; volume
   sta $4000
   rts
+.endproc
 
-num_sprites: .byte $03
-x_coords: .byte $00, $08, $0F
-y_coords: .byte $00, $00, $00
-tiles: .byte $05, $06, $03
-attrs: .byte $00, $00, $00
+
+.proc load_sprite
+  LDY oam_pointer
+  STA $0201, Y
+  TXA
+  STA $0202, Y
+  LDA #$00
+  STA $0200, Y
+  STA $0203, Y
+
+  LDA oam_pointer
+  ADC #4
+  STA oam_pointer
+  RTS
+.endproc
+
+num_sprites: .byte $02
+x_coords: .byte $00, $08
+y_coords: .byte $00, $00
+tiles: .byte $05, $06
+attrs: .byte $00, $00
 
 .segment "BSS"
 buttons: .res 1
 
+oam_pointer: .res 1
+
+left_sprite_addr: .res 1
+right_sprite_addr: .res 1
+player_x: .res 1
+player_y: .res 1
