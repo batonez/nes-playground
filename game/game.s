@@ -52,6 +52,7 @@ nmi:
 
   JSR read_input
   JSR handle_input
+  JSR update_player
 
   PLA
   TAX
@@ -162,7 +163,7 @@ irq:
   LDA #6
   LDX #0
   JSR load_sprite
-  STA right_sprite_addr
+  STX right_sprite_addr
 
 ; turn on NMIs, sprites use first pattern table
   LDA #%10010000  
@@ -191,32 +192,32 @@ forever:
 
   TXA
   AND #%00000100
-  BNE up_handler
-  up_handled:
+  BNE down_handler
+  down_handled:
 
   TXA
   AND #%00001000
-  BNE down_handler
-  down_handled:
+  BNE up_handler
+  up_handled:
 
   RTS
 
   right_handler:
-    INC $0203
+    INC player_x
     CLV
     BVC right_handled
   left_handler:
-    DEC $0203
+    DEC player_x
     CLV
     BVC left_handled
-  up_handler:
-    INC $0200
-    CLV
-    BVC up_handled
   down_handler:
-    DEC $0200
+    INC player_y
     CLV
     BVC down_handled
+  up_handler:
+    DEC player_y
+    CLV
+    BVC up_handled
 .endproc
 
 .proc read_input
@@ -233,6 +234,23 @@ forever:
   RTS
 .endproc
 
+.proc update_player
+  LDX left_sprite_addr
+
+  LDA player_x
+  STA $0203, X
+  LDA player_y
+  STA $0200, X
+
+  LDX right_sprite_addr
+  STA $0200, X
+
+  LDA player_x
+  ADC #7
+  STA $0203, X
+  RTS
+.endproc
+
 .proc beep
   lda #$01    ; enable pulse 1
   sta $4015
@@ -245,7 +263,6 @@ forever:
   rts
 .endproc
 
-
 .proc load_sprite
   LDY oam_pointer
   STA $0201, Y
@@ -256,16 +273,11 @@ forever:
   STA $0203, Y
 
   LDA oam_pointer
+  TAX
   ADC #4
   STA oam_pointer
   RTS
 .endproc
-
-num_sprites: .byte $02
-x_coords: .byte $00, $08
-y_coords: .byte $00, $00
-tiles: .byte $05, $06
-attrs: .byte $00, $00
 
 .segment "BSS"
 buttons: .res 1
@@ -276,3 +288,4 @@ left_sprite_addr: .res 1
 right_sprite_addr: .res 1
 player_x: .res 1
 player_y: .res 1
+
