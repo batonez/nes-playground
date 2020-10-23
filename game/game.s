@@ -53,9 +53,18 @@ nmi:
   LDA #$02
   STA OAMDMA
 
-  JSR update_player
+  JSR update_player_sprites
+  JSR simulation_tick
   JSR read_input
   JSR handle_input
+
+  INC timer
+  LDA #2
+  CMP timer
+  BCS skip_timer_zeroing
+  LDA #0
+  STA timer
+  skip_timer_zeroing:
 
   PLA
   TAX
@@ -156,6 +165,12 @@ irq:
   LDA #0
   STA player_x
   STA player_y
+  STA jump_force
+  STA is_on_the_floor
+  STA jump_btn_pressed
+
+; initialize nmi timer 
+  STA timer
 
 ; load player sprites
   LDA #5
@@ -203,6 +218,13 @@ forever:
   BNE up_handler
   up_handled:
 
+  TXA
+  AND #%10000000
+  BNE a_handler
+  LDA #0
+  STA jump_btn_pressed
+  a_handled:
+
   RTS
 
   right_handler:
@@ -214,19 +236,26 @@ forever:
     CLV
     BVC left_handled
   down_handler:
-    INC player_y
-
-    LDA #230
-    CMP player_y
-    BCS no_collision
-    STA player_y
-    no_collision:
-      CLV
-      BVC down_handled
+    CLV
+    BVC down_handled
   up_handler:
-    DEC player_y
     CLV
     BVC up_handled
+  a_handler:
+    LDA #0
+    CMP is_on_the_floor
+    BCS skip_jump
+    CMP jump_btn_pressed
+    BCC skip_jump
+
+    LDA #7
+    STA jump_force
+
+    skip_jump:
+    LDA #1
+    STA jump_btn_pressed
+    CLV
+    BVC a_handled
 .endproc
 
 .proc read_input
@@ -243,7 +272,7 @@ forever:
   RTS
 .endproc
 
-.proc update_player
+.proc update_player_sprites
   LDX left_sprite_addr
 
   LDA player_x
@@ -255,8 +284,47 @@ forever:
   STA OAMRAM + 0, X
 
   LDA player_x
+  CLC
   ADC #7
   STA OAMRAM + 3, X
+  RTS
+.endproc
+
+.proc simulation_tick
+  ; jump/fall
+  LDA player_y
+  SEC
+  SBC jump_force
+  CLC
+  ADC #2 ;gravity
+  STA player_y
+
+  ; decrease jump force by gravity every 3 frames if it's not 0
+  LDA #0
+  CMP jump_force
+  BCS skip_force_reduction
+  LDA #0
+  CMP timer
+  BCC skip_force_reduction
+
+  LDA jump_force
+  SEC
+  SBC #1
+  STA jump_force
+  skip_force_reduction:
+
+  ; collision with floor 
+  LDA #230
+  CMP player_y
+  BCS no_collision
+  STA player_y
+  LDA #1
+  STA is_on_the_floor
+  RTS
+
+  no_collision:
+  LDA #0
+  STA is_on_the_floor
   RTS
 .endproc
 
@@ -283,6 +351,7 @@ forever:
 
   LDA oam_pointer
   TAX
+  CLC
   ADC #4
   STA oam_pointer
   RTS
@@ -295,6 +364,10 @@ oam_pointer: .res 1
 
 left_sprite_addr: .res 1
 right_sprite_addr: .res 1
+jump_btn_pressed: .res 1
+jump_force: .res 1
+is_on_the_floor: .res 1
 player_x: .res 1
 player_y: .res 1
+timer: .res 1
 
