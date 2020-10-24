@@ -1,42 +1,12 @@
-;;; Size of PRG in units of 16 KiB.
-PRG_NPAGE = 1
-;;; Size of CHR in units of 8 KiB.
-CHR_NPAGE = 1
-;;; INES mapper number.
-MAPPER = 0
-;;; Mirroring (0 = horizontal, 1 = vertical)
-MIRRORING = 1
+.include "constants.inc"
+.include "emu.inc"
 
-;;; PPU registers.
-PPUCTRL   = $2000
-PPUMASK   = $2001
-PPUSTATUS = $2002
-OAMADDR   = $2003
-OAMDATA   = $2004
-PPUSCROLL = $2005
-PPUADDR   = $2006
-PPUDATA   = $2007
-
-;;; Other IO registers.
-OAMDMA    = $4014
-APUSTATUS = $4015
-JOYPAD1   = $4016
-JOYPAD2   = $4017
-
-;;; OAM RAM start
-OAMRAM    = $0200
-
-.segment "INES"
-  .byte $4e, $45, $53, $1a
-  .byte PRG_NPAGE 
-  .byte CHR_NPAGE
-  .byte ((MAPPER & $0f) << 4) | (MIRRORING & 1)
-  .byte MAPPER & $f0
+.import set_palettes
+.import game_init
+.import game_main
 
 .segment "VECTOR"
-  .addr nmi
-  .addr reset
-  .addr irq
+  .addr nmi, reset, irq
 
 .segment "CHR0a"
   .incbin "graphics.chr"
@@ -75,113 +45,8 @@ irq:
   rti
 
 .proc reset
-  ; write palettes
-  LDX PPUSTATUS ; resets PPUADDR
-  LDX #$3f
-  STX PPUADDR
-  LDX #$00
-  STX PPUADDR
-
-  ; four background palettes
-  LDA #$22
-  STA PPUDATA
-  LDA #$16
-  STA PPUDATA
-  LDA #$2A
-  STA PPUDATA
-  LDA #$08
-  STA PPUDATA
-
-  LDA #$22
-  STA PPUDATA
-  LDA #$16
-  STA PPUDATA
-  LDA #$2A
-  STA PPUDATA
-  LDA #$08
-  STA PPUDATA
-
-  LDA #$22
-  STA PPUDATA
-  LDA #$16
-  STA PPUDATA
-  LDA #$2A
-  STA PPUDATA
-  LDA #$08
-  STA PPUDATA
-
-  LDA #$22
-  STA PPUDATA
-  LDA #$16
-  STA PPUDATA
-  LDA #$2A
-  STA PPUDATA
-  LDA #$08
-  STA PPUDATA
-
-  ; four foreground palettes
-  LDA #$22
-  STA PPUDATA
-  LDA #$30
-  STA PPUDATA
-  LDA #$2A
-  STA PPUDATA
-  LDA #$08
-  STA PPUDATA
-
-  LDA #$22
-  STA PPUDATA
-  LDA #$16
-  STA PPUDATA
-  LDA #$2A
-  STA PPUDATA
-  LDA #$08
-  STA PPUDATA
-
-  LDA #$22
-  STA PPUDATA
-  LDA #$16
-  STA PPUDATA
-  LDA #$2A
-  STA PPUDATA
-  LDA #$08
-  STA PPUDATA
-
-  LDA #$22
-  STA PPUDATA
-  LDA #$16
-  STA PPUDATA
-  LDA #$2A
-  STA PPUDATA
-  LDA #$08
-  STA PPUDATA
-;;;;
-
-; initialize oam pointer
-  LDA #0
-  STA oam_pointer
-
-; initialize player
-  LDA #0
-  STA player_x
-  STA player_y
-  STA jump_force
-  STA is_on_the_floor
-  STA jump_btn_pressed
-
-; initialize nmi timer 
-  STA timer
-
-; load player sprites
-  LDA #5
-  LDX #0
-  JSR load_sprite
-  STX left_sprite_addr
-
-  LDA #6
-  LDX #0
-  JSR load_sprite
-  STX right_sprite_addr
+  JSR set_palettes
+  JSR game_init
 
 ; turn on NMIs, sprites use first pattern table
   LDA #%10010000  
@@ -191,8 +56,7 @@ irq:
   LDA #%00011110  
   STA PPUMASK
 
-forever:
-  JMP forever
+  JSR game_main
 .endproc
 
 .proc handle_input
@@ -299,7 +163,7 @@ forever:
   ADC #2 ;gravity
   STA player_y
 
-  ; decrease jump force by gravity every 3 frames if it's not 0
+  ; decrease jump force by gravity every 3 frames if it's not zero
   LDA #0
   CMP jump_force
   BCS skip_force_reduction
@@ -371,3 +235,13 @@ player_x: .res 1
 player_y: .res 1
 timer: .res 1
 
+.export load_sprite
+.export oam_pointer
+.export left_sprite_addr
+.export right_sprite_addr
+.export jump_btn_pressed
+.export jump_force
+.export is_on_the_floor
+.export player_x
+.export player_y
+.export timer

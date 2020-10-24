@@ -1,5 +1,7 @@
 #! /bin/sh
 
 ca65 -o bin/game.o game.s
-cl65 --config linker.conf -o bin/game.nes bin/game.o
+ca65 -o bin/palettes.o palettes.s
+ca65 -o bin/gameplay.o gameplay.s
+cl65 --config linker.conf -o bin/game.nes bin/game.o bin/palettes.o bin/gameplay.o
 
