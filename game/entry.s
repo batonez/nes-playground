@@ -5,7 +5,7 @@
 .import game_init
 .import game_main
 
-.import update_player_sprites
+.import player_update_sprites
 .import player_simulation_tick
 .import left_handler
 .import right_handler
@@ -32,10 +32,10 @@ nmi:
   LDA #$02
   STA OAMDMA
 
-  JSR update_player_sprites
+  JSR player_update_sprites
   JSR simulation_tick
   JSR read_input
-  JSR handle_input
+  JSR dispatch_input_event
 
   INC timer
   LDA #2
@@ -68,7 +68,7 @@ irq:
   JSR game_main
 .endproc
 
-.proc handle_input
+.proc dispatch_input_event
   LDX buttons
 
   TXA

@@ -25,7 +25,7 @@
     RTS
   .endproc
 
-  .proc update_player_sprites
+  .proc player_update_sprites
     LDX left_sprite_addr
 
     LDA player_x
@@ -124,7 +124,7 @@
   player_y: .res 1
 
 .export player_init
-.export update_player_sprites
+.export player_update_sprites
 .export player_simulation_tick
 
 .export left_handler
