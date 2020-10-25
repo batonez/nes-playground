@@ -5,6 +5,8 @@
 .import game_init
 .import game_main
 
+.import block_update_sprites
+
 .import player_update_sprites
 .import player_simulation_tick
 .import left_handler
@@ -33,6 +35,7 @@ nmi:
   STA OAMDMA
 
   JSR player_update_sprites
+  JSR block_update_sprites
   JSR simulation_tick
   JSR read_input
   JSR dispatch_input_event

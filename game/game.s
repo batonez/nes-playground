@@ -1,6 +1,7 @@
 .import oam_pointer
 .import timer
 .import player_init
+.import block_init
 
 .segment "CODE"
   .proc game_init
@@ -11,6 +12,7 @@
     STA timer
 
     JSR player_init
+    JSR block_init
 
     RTS
   .endproc
@@ -21,5 +23,11 @@
     RTS
   .endproc
 
+  .proc nmi_loop
+    RTS
+  .endproc
+
 .export game_init
 .export game_main
+.export nmi_loop
+
