@@ -12,6 +12,7 @@
 .import up_handler
 .import down_handler
 .import a_handler
+.import a_handler_down
 
 .segment "VECTOR"
   .addr nmi, reset, irq
@@ -98,13 +99,23 @@ irq:
   AND #%10000000
   BEQ skip_a_handler
   JSR a_handler
-  LDA #0
-  STA jump_btn_pressed
   skip_a_handler:
+
+  TXA
+  AND #%10000000
+  BEQ skip_a_handler_down
+  AND buttons_prev
+  BNE skip_a_handler_down
+  JSR a_handler_down
+  skip_a_handler_down:
+
   RTS
 .endproc
 
 .proc read_input
+  LDA buttons
+  STA buttons_prev
+
   LDA #$01
   STA JOYPAD1
   STA buttons
@@ -154,11 +165,10 @@ irq:
 
 .segment "BSS"
 buttons: .res 1
+buttons_prev: .res 1
 oam_pointer: .res 1
-jump_btn_pressed: .res 1
 timer: .res 1
 
 .export load_sprite
 .export oam_pointer
 .export timer
-.export jump_btn_pressed

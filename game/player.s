@@ -1,6 +1,5 @@
 .include "constants.inc"
 
-.import jump_btn_pressed
 .import load_sprite
 .import timer
 
@@ -12,7 +11,6 @@
     STA player_y
     STA jump_force
     STA is_on_the_floor
-    STA jump_btn_pressed
 
   ; load player sprites
     LDA #5
@@ -89,32 +87,32 @@
   .endproc
 
   .proc left_handler
-      DEC player_x
-      RTS
+    DEC player_x
+    RTS
   .endproc
 
   .proc down_handler
-      RTS
+    RTS
   .endproc
 
   .proc up_handler
-      RTS
+    RTS
   .endproc
 
   .proc a_handler
-      LDA #0
-      CMP is_on_the_floor
-      BCS skip_jump
-      CMP jump_btn_pressed
-      BCC skip_jump
+    RTS
+  .endproc
 
-      LDA #7
-      STA jump_force
+  .proc a_handler_down
+    LDA #0
+    CMP is_on_the_floor
+    BCS skip_jump
 
-      skip_jump:
-      LDA #1
-      STA jump_btn_pressed
-      RTS
+    LDA #7
+    STA jump_force
+
+    skip_jump:
+    RTS
   .endproc
 
 .segment "BSS"
@@ -134,3 +132,5 @@
 .export up_handler
 .export down_handler
 .export a_handler
+.export a_handler_down
+
