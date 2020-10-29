@@ -7,14 +7,14 @@
   ; initialize block vars
     LDA #80
     STA block_x
-    LDA #220
+    LDA #190
     STA block_y
     LDA #1
     STA block_size
     STA block_size + 1
 
   ; load block sprites
-    LDA #3
+    LDA #39
     LDX #0
     JSR load_sprite
     STX sprite_addr

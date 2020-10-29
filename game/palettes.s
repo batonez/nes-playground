@@ -10,7 +10,7 @@
   STX PPUADDR
 
   ; four background palettes
-  LDA #$22
+  LDA #$00
   STA PPUDATA
   LDA #$16
   STA PPUDATA
@@ -47,22 +47,22 @@
   STA PPUDATA
 
   ; four foreground palettes
-  LDA #$22
+  LDA #$3f
   STA PPUDATA
-  LDA #$30
+  LDA #$09
   STA PPUDATA
-  LDA #$2A
+  LDA #$19
   STA PPUDATA
-  LDA #$08
+  LDA #$29
   STA PPUDATA
 
-  LDA #$22
-  STA PPUDATA
-  LDA #$16
-  STA PPUDATA
-  LDA #$2A
+  LDA #$3f
   STA PPUDATA
   LDA #$08
+  STA PPUDATA
+  LDA #$18
+  STA PPUDATA
+  LDA #$28
   STA PPUDATA
 
   LDA #$22

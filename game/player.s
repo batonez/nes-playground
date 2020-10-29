@@ -18,13 +18,13 @@
     STA player_size + 1
 
   ; load player sprites
-    LDA #5
-    LDX #0
+    LDA #37
+    LDX #1
     JSR load_sprite
     STX left_sprite_addr
 
-    LDA #6
-    LDX #0
+    LDA #38
+    LDX #1
     JSR load_sprite
     STX right_sprite_addr
     RTS
