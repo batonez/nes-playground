@@ -14,7 +14,7 @@
     STA block_size + 1
 
   ; load block sprites
-    LDA #39
+    LDA #40
     LDX #0
     JSR load_sprite
     STX sprite_addr

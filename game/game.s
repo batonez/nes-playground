@@ -2,6 +2,7 @@
 .import timer
 .import player_init
 .import block_init
+.import text_init
 
 .segment "CODE"
   .proc game_init
@@ -13,6 +14,7 @@
 
     JSR player_init
     JSR block_init
+    JSR text_init
 
     RTS
   .endproc

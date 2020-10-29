@@ -8,6 +8,8 @@
 
 .import block_update_sprites
 
+.import text_update_sprites
+
 .import player_update_sprites
 .import player_simulation_tick
 .import left_handler
@@ -39,6 +41,7 @@ nmi:
   JSR resolve_collisions
   JSR player_update_sprites
   JSR block_update_sprites
+  JSR text_update_sprites
 
   JSR read_input
   JSR dispatch_input_event

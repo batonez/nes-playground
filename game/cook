@@ -2,9 +2,10 @@
 
 ca65 -o bin/player.o player.s
 ca65 -o bin/block.o block.s
+ca65 -o bin/text.o text.s
 ca65 -o bin/collisions.o collisions.s
 ca65 -o bin/game.o game.s
 ca65 -o bin/palettes.o palettes.s
 ca65 -o bin/entry.o entry.s
-cl65 --config linker.conf -o bin/game.nes bin/collisions.o bin/player.o bin/block.o bin/game.o bin/palettes.o bin/entry.o
+cl65 --config linker.conf -o bin/game.nes bin/collisions.o bin/player.o bin/block.o bin/text.o bin/game.o bin/palettes.o bin/entry.o
 
