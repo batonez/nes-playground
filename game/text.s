@@ -31,7 +31,14 @@
     JSR load_sprite
     STX sprite_addr
 
+    LDA text + 1
+    SEC
+    SBC #65
+    LDX #0
+    JSR load_sprite
+    STX sprite_addr + 1
     RTS
+
   .endproc
 
   .proc text_update_sprites
@@ -44,13 +51,22 @@
     LDA text_y
     STA OAMRAM + 0, X
 
+    LDX sprite_addr + 1
+
+    LDA text_x
+    CLC
+    ADC #8
+    STA OAMRAM + 3, X
+    LDA text_y
+    STA OAMRAM + 0, X
+
     RTS
   .endproc
   
-  text: .asciiz "/"
+  text: .asciiz "XY"
 
 .segment "BSS"
-  sprite_addr: .res 1
+  sprite_addr: .res 20
 
   text_coord:
   text_x: .res 1
