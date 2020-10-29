@@ -8,9 +8,14 @@
   ; initialize player vars
     LDA #0
     STA player_x
+    LDA #1
     STA player_y
     STA jump_force
     STA is_on_the_floor
+    LDA #2
+    STA player_size
+    LDA #1
+    STA player_size + 1
 
   ; load player sprites
     LDA #5
@@ -120,6 +125,9 @@
   right_sprite_addr: .res 1
   jump_force: .res 1
   is_on_the_floor: .res 1
+  player_size: .res 2
+
+  player_coord:
   player_x: .res 1
   player_y: .res 1
 
@@ -133,4 +141,10 @@
 .export down_handler
 .export a_handler
 .export a_handler_down
+.export player_size
+
+.export player_coord
+.export player_x
+.export player_y
+.export player_size
 

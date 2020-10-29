@@ -7,8 +7,11 @@
   ; initialize block vars
     LDA #80
     STA block_x
-    LDA #208
+    LDA #220
     STA block_y
+    LDA #1
+    STA block_size
+    STA block_size + 1
 
   ; load block sprites
     LDA #3
@@ -34,9 +37,16 @@
 
 .segment "BSS"
   sprite_addr: .res 1
+  block_size: .res 2
+
+  block_coord:
   block_x: .res 1
   block_y: .res 1
 
 .export block_init
 .export block_update_sprites
 
+.export block_coord
+.export block_x
+.export block_y
+.export block_size

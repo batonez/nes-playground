@@ -4,6 +4,7 @@
 .import set_palettes
 .import game_init
 .import game_main
+.import resolve_collisions
 
 .import block_update_sprites
 
@@ -34,9 +35,11 @@ nmi:
   LDA #$02
   STA OAMDMA
 
+  JSR simulation_tick
+  JSR resolve_collisions
   JSR player_update_sprites
   JSR block_update_sprites
-  JSR simulation_tick
+
   JSR read_input
   JSR dispatch_input_event
 
@@ -175,3 +178,4 @@ timer: .res 1
 .export load_sprite
 .export oam_pointer
 .export timer
+.export beep
