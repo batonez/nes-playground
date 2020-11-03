@@ -7,7 +7,7 @@
   ; initialize block vars
     LDA #80
     STA block_x
-    LDA #190
+    LDA #200
     STA block_y
     LDA #8
     STA block_size

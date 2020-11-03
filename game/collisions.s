@@ -15,6 +15,8 @@
     LDA #0
     STA x_dist
     STA y_dist
+    STA x_sign
+    STA y_sign
 
     LDA player_y
     CLC
@@ -56,6 +58,8 @@
     CMP y_dist
     BCS skip_overwrite_y
     STA y_dist
+    LDA #1
+    STA y_sign
     skip_overwrite_y:
 
     caclulate_x_dist:
@@ -74,6 +78,8 @@
     CMP x_dist
     BCS skip_overwrite_x
     STA x_dist
+    LDA #1
+    STA x_sign
     skip_overwrite_x:
 
     JSR resolve_collision
@@ -83,30 +89,52 @@
   .endproc
 
   .proc resolve_collision
+    LDA #1
+    STA axis
+    LDA y_dist
+    STA dist
+    LDA y_sign
+    STA sign
+
     LDA x_dist
     CMP y_dist
-    BCS resolve_y
-    
-    resolve_x:
-    LDA player_x
-    SEC
-    SBC x_dist
-    STA player_x
-    CLV
-    BVC end
+    BCS skip_axis_override
+    LDA #0
+    STA axis
+    LDA x_dist
+    STA dist
+    LDA x_sign
+    STA sign
+    skip_axis_override:
+ 
+    LDA sign
+    AND #1
+    BEQ add
 
-    resolve_y:
-    LDA player_y
+    LDX axis
+    LDA player_coord, X
     SEC
-    SBC y_dist
-    STA player_y
+    SBC dist
+    STA player_coord, X
+    RTS
+
+    add:
+    LDX axis
+    LDA player_coord, X
+    CLC
+    ADC dist
+    STA player_coord, X
     
-    end:
     RTS
   .endproc
 
 .segment "BSS"
   x_dist: .res 1
   y_dist: .res 1
+  x_sign: .res 1
+  y_sign: .res 1
+  dist: .res 1
+  axis: .res 1
+  sign: .res 1
 
 .export resolve_collisions
