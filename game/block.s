@@ -9,7 +9,7 @@
     STA block_x
     LDA #190
     STA block_y
-    LDA #1
+    LDA #8
     STA block_size
     STA block_size + 1
 

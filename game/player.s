@@ -12,9 +12,9 @@
     STA player_y
     STA jump_force
     STA is_on_the_floor
-    LDA #2
+    LDA #16
     STA player_size
-    LDA #1
+    LDA #8
     STA player_size + 1
 
   ; load player sprites
