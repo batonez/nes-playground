@@ -2,6 +2,7 @@
 .import player_x
 .import player_y
 .import player_size
+.import is_on_the_floor
 
 .import block_coord
 .import block_x
@@ -17,6 +18,7 @@
     STA y_dist
     STA x_sign
     STA y_sign
+    STA is_on_the_floor
 
     LDA player_y
     CLC
@@ -116,6 +118,10 @@
     SEC
     SBC dist
     STA player_coord, X
+
+    ; set jump flag
+    LDA #1
+    STA is_on_the_floor
     RTS
 
     add:

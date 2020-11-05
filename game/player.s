@@ -70,19 +70,6 @@
     SBC #1
     STA jump_force
     skip_force_reduction:
-
-    ; collision with floor 
-    LDA #230
-    CMP player_y
-    BCS no_collision
-    STA player_y
-    LDA #1
-    STA is_on_the_floor
-    RTS
-
-    no_collision:
-    LDA #0
-    STA is_on_the_floor
     RTS
   .endproc
 
@@ -147,4 +134,5 @@
 .export player_x
 .export player_y
 .export player_size
+.export is_on_the_floor
 
