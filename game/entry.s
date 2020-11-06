@@ -38,7 +38,7 @@ nmi:
   STA OAMDMA
 
   JSR simulation_tick
-  JSR resolve_collisions
+  ;JSR resolve_collisions
   JSR player_update_sprites
   JSR block_update_sprites
   JSR text_update_sprites

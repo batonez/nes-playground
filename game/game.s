@@ -3,6 +3,7 @@
 .import player_init
 .import block_init
 .import text_init
+.import init_objects_array
 
 .segment "CODE"
   .proc game_init
@@ -12,6 +13,7 @@
   ; initialize nmi timer 
     STA timer
 
+    JSR init_objects_array
     JSR player_init
     JSR block_init
     JSR text_init

@@ -1,23 +1,32 @@
 .include "constants.inc"
+.include "object_struct.inc"
 
 .import load_sprite
 
 .segment "CODE"
+  .proc init_objects_array
+    LDA #0
+    STA array_size
+    RTS
+  .endproc
+
   .proc block_init
   ; initialize block vars
+    INC array_size
+
     LDA #80
-    STA block_x
+    STA objects + COORD_X
     LDA #200
-    STA block_y
+    STA objects + COORD_Y
     LDA #8
-    STA block_size
-    STA block_size + 1
+    STA objects + SIZE_X
+    STA objects + SIZE_Y
 
   ; load block sprites
     LDA #40
     LDX #0
     JSR load_sprite
-    STX sprite_addr
+    STX objects + SPRITE_INDEX
 
     RTS
   .endproc
@@ -25,28 +34,21 @@
   .proc block_update_sprites
     ; We do nothing here, just waste cycles
     ; Better to pass x and y to load_sprites and get rid of this code
-    LDX sprite_addr
+    LDX objects + SPRITE_INDEX
 
-    LDA block_x
+    LDA objects + COORD_X
     STA OAMRAM + 3, X
-    LDA block_y
+    LDA objects + COORD_Y
     STA OAMRAM + 0, X
 
     RTS
   .endproc
 
 .segment "BSS"
-  sprite_addr: .res 1
-  block_size: .res 2
+  array_size: .res 1
+  objects: .res 50
 
-  block_coord:
-  block_x: .res 1
-  block_y: .res 1
-
+.export init_objects_array
 .export block_init
 .export block_update_sprites
 
-.export block_coord
-.export block_x
-.export block_y
-.export block_size
