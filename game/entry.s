@@ -160,8 +160,9 @@ irq:
   STA OAMRAM + 1, Y
   TXA
   STA OAMRAM + 2, Y
-  LDA #$00
+  LDA $01
   STA OAMRAM + 0, Y
+  LDA $00
   STA OAMRAM + 3, Y
 
   LDA oam_pointer

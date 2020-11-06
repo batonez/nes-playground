@@ -15,8 +15,17 @@
 
     JSR init_objects_array
     JSR player_init
-    JSR block_init
     JSR text_init
+
+    LDX #80
+    LDY #200
+    JSR block_init
+    LDX #88
+    LDY #200
+    JSR block_init
+    LDX #96
+    LDY #200
+    JSR block_init
 
     RTS
   .endproc

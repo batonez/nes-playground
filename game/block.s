@@ -14,15 +14,17 @@
   ; initialize block vars
     INC array_size
 
-    LDA #80
-    STA objects + COORD_X
-    LDA #200
-    STA objects + COORD_Y
+    STX objects + COORD_X
+    STY objects + COORD_Y
     LDA #8
     STA objects + SIZE_X
     STA objects + SIZE_Y
 
   ; load block sprites
+    LDA objects + COORD_X
+    STA $00
+    LDA objects + COORD_Y
+    STA $01
     LDA #40
     LDX #0
     JSR load_sprite
@@ -32,15 +34,6 @@
   .endproc
 
   .proc block_update_sprites
-    ; We do nothing here, just waste cycles
-    ; Better to pass x and y to load_sprites and get rid of this code
-    LDX objects + SPRITE_INDEX
-
-    LDA objects + COORD_X
-    STA OAMRAM + 3, X
-    LDA objects + COORD_Y
-    STA OAMRAM + 0, X
-
     RTS
   .endproc
 
