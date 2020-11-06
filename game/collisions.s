@@ -9,8 +9,6 @@
 .import block_y
 .import block_size
 
-.import beep
-
 .segment "CODE"
   .proc resolve_collisions
     LDA #0
